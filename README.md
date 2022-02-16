@@ -6,7 +6,9 @@ Code for reproducing models and training setup for the article:
 >[[MNRAS]](https://doi.org/10.1093/mnras/stab3215) [[arXiv]](https://arxiv.org/abs/2107.00018)
 
 ## Instructions
-`run.py` scripts sets up and runs the training, `saliency_map.py` computes a saliency used in the article.
+To install and use functionalities, pull the repository and call `pip install -e .` or `pip install -e ".[hvd]"` for `horovod` support.
+
+`run.py` script sets up and runs the training.
 ```
 $ python run.py -h
 usage: Model Fit [-h] [--database {default,ska,horizon_wedge}]
