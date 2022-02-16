@@ -343,9 +343,10 @@ def fit(restore_training=True):
     )
 
 
-def predict(Type):
-    """
-    Type: "best" or "last"
+def predict(Type="last"):
+    """Run full predict over test set.
+    Args:
+        Type: "best" or "last", used as a saving flag and for logs
     """
     custom_obj = {}
     custom_obj["R2"] = R2
@@ -394,3 +395,68 @@ def predict(Type):
             f.write("\n".join(stringlist))
 
     return true, pred, R2_score
+
+
+def average_gradient_saliency(
+    model,
+    image,
+    model_input_shape=(25, 25, 526),
+    model_output_shape=(4,),
+):
+    """Computing average of the gradient saliency map.
+    The function takes all possible slices of the input image and computes
+    gradients for each one. Assumes CNN model. Iterations are taken only over
+    first two (spatial) dimensions.
+
+    Args:
+        model: `keras.Model`
+        image: input image, usually larger dimensions than the model input
+
+    Returns:
+        grads: averaged gradients
+    """
+    image_shape = image.shape
+    if len(model_input_shape) != len(image_shape):
+        raise AttributeError(
+            "Model input and `image` should be of same dimensionality."
+        )
+    if (
+        model_input_shape[0] > image_shape[0]
+        or model_input_shape[1] > image_shape[1]
+        or model_input_shape[-1] != image_shape[-1]
+    ):
+        raise AttributeError(
+            "`image` should be larger or equal than `model_input_shape` "
+            "in firs two, spatial dimensions and equal in last, redshift dimension."
+        )
+    per_param_grads = np.zeros(model_output_shape + model_input_shape, dtype=np.float64)
+
+    for i in range(image_shape[0]):
+        # print(i, end=" ")
+        for j in range(image_shape[1]):
+            im = np.roll(np.roll(image, i, axis=0), j, axis=1)[
+                : model_input_shape[0], : model_input_shape[1], :
+            ]
+            # first axis in gradients are parameters
+            per_param_grads = np.roll(np.roll(per_param_grads, i, axis=1), j, axis=2)
+            ppg = _calculate_saliency_gradients(model, im)
+            per_param_grads[: model_input_shape[0], : model_input_shape[1], :] += ppg
+            per_param_grads = np.roll(np.roll(per_param_grads, -i, axis=1), -j, axis=2)
+
+    return per_param_grads
+
+
+def _calculate_saliency_gradients(model, image):
+    """One iteration of the saliency computation."""
+    image = tf.convert_to_tensor(image, dtype=tf.float32)
+    image = tf.expand_dims(image, -1)
+    image = tf.expand_dims(image, 0)
+
+    with tf.GradientTape() as tape:
+        tape.watch(image)
+        pred_params = model(image, training=False)
+
+    per_param_grads = tape.jacobian(pred_params, image)
+    per_param_grads = np.squeeze(per_param_grads.numpy())
+
+    return per_param_grads
