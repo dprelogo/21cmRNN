@@ -406,7 +406,8 @@ def average_gradient_saliency(
     """Computing average of the gradient saliency map.
     The function takes all possible slices of the input image and computes
     gradients for each one. Assumes CNN model. Iterations are taken only over
-    first two (spatial) dimensions.
+    first two (spatial) dimensions, for which we assume the imput image being
+    periodic, i.e. computed using periodic boundary conditions.
 
     Args:
         model: `keras.Model`
