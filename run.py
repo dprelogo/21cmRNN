@@ -17,7 +17,7 @@ parser.add_argument(
     type=str,
     choices=ctx.database.keys(),
     default="default",
-    help="Database to be used for the run.",
+    help="Database to be used for the run. (default: default)",
 )
 parser.add_argument(
     "--X_fstring",
@@ -78,14 +78,14 @@ parser.add_argument(
     "--warmup",
     type=int,
     default=0,
-    help="In the case of multi-gpu training, for how many epochs to linearly increase learining rate?",
+    help="In the case of multi-gpu training, for how many epochs to linearly increase learining rate? (default: 0)",
 )
 parser.add_argument(
     "--LR_correction",
     type=int,
     choices=[0, 1],
     default=1,
-    help="In the case of multi-gpu training, should learning rate be multiplied by number of GPUs?",
+    help="In the case of multi-gpu training, should learning rate be multiplied by number of GPUs? (default: 0)",
 )
 parser.add_argument(
     "--mixed_precision",
@@ -134,7 +134,7 @@ parser.add_argument(
     type=int,
     choices=[0, 1],
     default=1,
-    help="Creating TensorBoard logs during the run?",
+    help="Creating TensorBoard logs during the run? (default: 1)",
 )
 parser.add_argument(
     "--logs_location", type=str, default="logs/", help="Defaults to `logs/`"

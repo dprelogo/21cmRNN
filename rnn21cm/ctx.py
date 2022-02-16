@@ -26,13 +26,6 @@ def init():
     load_model = None  # if we are loading the model or have training from beginning - important for warmup callback
 
     database = {
-        "default2D": [
-            "clipped_-250_+50",
-            "NaN_removed",
-            "TVT_parameterwise",
-            "boxcar44",
-            "10slices",
-        ],
         "default": [
             "clipped_-250_+50",
             "NaN_removed",
@@ -58,16 +51,6 @@ def init():
             "tools21cm",
             "SKA1000",
             "horizon_wedge",
-        ],
-        "fwhm_wedge": [
-            "clipped_-250_+50",
-            "NaN_removed",
-            "TVT_parameterwise",
-            "boxcar444",
-            "sliced22",
-            "tools21cm",
-            "SKA1000",
-            "fwhm_wedge",
         ],
     }  # different databases descriptors
     formatting = None  # contains a database descriptor
